@@ -1,18 +1,21 @@
-FROM openjdk:8-jdk-alpine as build
-WORKDIR /workspace/app
+FROM maven:3.5.2-jdk-8-alpine AS MAVEN_BUILD
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
+MAINTAINER Suraj Panda
 
-RUN ./mvnw package
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+COPY pom.xml /build/
 
-FROM openjdk:8-jdk-alpine
-VOLUME /tmp
-ARG DEPENDENCY=/workspace/app/target/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.demo.bankapp.BankApplication"]
+COPY src /build/src
+
+WORKDIR /build/
+
+RUN mvn package
+
+FROM openjdk:8-jre-alpine
+WORKDIR /app
+COPY --from=MAVEN_BUILD /build/target/*.jar /app/app.jar
+
+ENV HOST=0.0.0.0 PORT=3000
+
+EXPOSE 3000/tcp
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
