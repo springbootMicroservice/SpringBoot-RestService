@@ -14,8 +14,8 @@ FROM openjdk:8-jre-alpine
 WORKDIR /app
 COPY --from=MAVEN_BUILD /build/target/*.war /app/app.war
 
-ENV HOST=0.0.0.0 PORT=3000
+ENV HOST=0.0.0.0 PORT=4000
 
-EXPOSE 3000/tcp
+EXPOSE 4000/tcp
 
 ENTRYPOINT ["java", "-jar", "app.war"]
