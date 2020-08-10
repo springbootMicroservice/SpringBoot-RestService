@@ -10,7 +10,7 @@ spring.datasource:
     url: jdbc:h2:mem:bootexample;MODE=MySQL
 
 server:
-  port: 3000
+  port: 4000
 
 #todo: make sure to always enable security in production
 security:
